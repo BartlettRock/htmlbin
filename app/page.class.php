@@ -1,0 +1,104 @@
+<?php
+/**
+ * static function library for creating and viewing htmlbin pages
+ *
+ *     htmlbin Copyright (C) 2010  Callan Bryant <callan1990@googlemail.com>
+ *
+ *     Based on Voswork - A simple, fast PHP filesystem abstraction layer
+ *     Voswork Copyright (C) 2010  Callan Bryant <callan1990@googlemail.com>
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * @package main
+ * @author Callan Bryant <callan1990@googlemail.com>
+ */
+
+/**
+ * for now, just relies on cache. File support will be worked upon.
+ */
+class page
+{
+	const ID_REGEX	= '/^[a-f0-9]{6}$/';
+
+	/**
+	 * returns a new random page ID
+	 */
+	public static function new_id()
+	{
+		// return the last 5 characters of a random salted sha1 hash
+		// this conforms to ID regex		
+		return substr( sha1(__FILE__.time().rand()) , -6);
+	}
+
+	/**
+	 * echoes a page with an ID
+	 * @param string $id of existing page
+	 */
+	public static function view($id)
+	{
+		$s 	= new http();
+		$s->load_local_file(self::path($id));
+	}
+
+	/**
+	 * creates a page given the source, returns the ID for that page
+	 * @param string $source HTML source code
+	 * @return string ID of newly created page
+	 */
+	public static function create(&$source)
+	{
+		$id		= self::new_id();
+
+		$file	= self::path($id);
+
+		file_put_contents($file,$source);
+		return $id;
+	}
+
+	/**
+	 * removes all pages
+	 */
+	public static function flush()
+	{
+		foreach (glob(PAGES_DIR.'*.*') as $file )
+			unlink ($file);
+	}
+
+	/**
+	 * removes all pages that have not been accessed in MAX_AGE in seconds
+	 */
+	public static function purge()
+	{
+	}
+
+	/**
+	 * returns the path used to save the actual file given the ID
+	 * @param string $id of a page
+	 * @return string tag to save or cache the page with
+	 */
+	public static function path(&$id)
+	{
+		// check the ID is valid first
+		if (!preg_match (self::ID_REGEX,$id))
+			throw new Exception('invalid ID given');
+
+		return PAGES_DIR.'/'.$id.'.html';
+	}
+}
+
+
+?>
+
+
