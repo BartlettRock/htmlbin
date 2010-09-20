@@ -33,13 +33,15 @@ class page
 	const ID_REGEX	= '/^[a-f0-9]{6}$/';
 
 	/**
-	 * returns a new random page ID
+	 * returns page ID given source
+	 * @param string $source HTML source code
+	 * @return string ID of newly created page
 	 */
-	public static function new_id()
+	public static function id(&$source)
 	{
 		// return the last 5 characters of a random salted sha1 hash
 		// this conforms to ID regex		
-		return substr( sha1(__FILE__.time().rand()) , -6);
+		return substr( sha1(__FILE__.$source) , -6);
 	}
 
 	/**
@@ -59,7 +61,7 @@ class page
 	 */
 	public static function create(&$source)
 	{
-		$id		= self::new_id();
+		$id		= self::id($source);
 
 		$file	= self::path($id);
 
