@@ -30,8 +30,6 @@
  */
 class page
 {
-	const ID_REGEX	= '/^[a-f0-9]{6}$/';
-
 	/**
 	 * returns page ID given source
 	 * @param string $source HTML source code
@@ -41,7 +39,7 @@ class page
 	{
 		// return the last 5 characters of a random salted sha1 hash
 		// this conforms to ID regex		
-		return substr( sha1(__FILE__.$source) , -6);
+		return substr( sha1(__FILE__.$source) , -HASH_LENGTH);
 	}
 
 	/**
@@ -92,8 +90,11 @@ class page
 	 */
 	public static function path(&$id)
 	{
+		// valid ID is  HASH_LENGTH  hex chars
+		$regex	= '/^[a-f0-9]{'.HASH_LENGTH.'}$/';
+
 		// check the ID is valid first
-		if (!preg_match (self::ID_REGEX,$id))
+		if (!preg_match ($regex,$id))
 			throw new Exception('invalid ID given');
 
 		return PAGES_DIR.'/'.$id.'.html';

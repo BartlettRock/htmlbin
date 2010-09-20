@@ -30,7 +30,7 @@ if (!input::arg('source') )
 
 $id		= page::create(input::arg('source'));
 
-$link	= 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URL'].'?'.$id;
+$link	= 'http://'.$_SERVER['SERVER_NAME'].'/?'.$id;
 
 ?>
 <!DOCTYPE html>
