@@ -225,7 +225,6 @@ class http
 	 */
 	public static function status($code)
 	{
-		header('Content-Type: text/plain');
 		switch($code)
 		{
 			case 200:
@@ -248,6 +247,7 @@ class http
 			break;
 		}
 		header('HTTP/1.1 '.$code);
+		header('Content-Type: text/plain');	
 		echo($code."\n");
 	}
 	 

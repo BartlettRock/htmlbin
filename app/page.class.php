@@ -48,8 +48,12 @@ class page
 	 */
 	public static function view($id)
 	{
+		// must set a variable rather than nest the function - otherwise
+		// the Exception thrown in the path function won't get caught.....
+		$valid_path	= self::path($id);
+
 		$s 	= new http();
-		$s->load_local_file(self::path($id));
+		$s->load_local_file($valid_path);
 	}
 
 	/**
@@ -103,5 +107,3 @@ class page
 
 
 ?>
-
-
