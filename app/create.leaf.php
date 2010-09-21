@@ -37,7 +37,8 @@ $link	= 'http://'.$_SERVER['SERVER_NAME'].'/?'.$id;
 <html>
 
 <head>
-	<title>htmlbin - page created!</title>
+<title>htmlbin - page created!</title>
+<link rel="stylesheet" type="text/css" media="screen" href="?leaf=style" />
 </head>
 
 <body>
@@ -45,6 +46,5 @@ $link	= 'http://'.$_SERVER['SERVER_NAME'].'/?'.$id;
 <h1>Your page has been created!</h1>
 
 Here is the link: <a href="<?php echo $link; ?>"><?php echo $link; ?></a>
-
 </body>
 </html>
