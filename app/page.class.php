@@ -86,31 +86,16 @@ class page
 	 */
 	public static function flush()
 	{
-		$handle		= @opendir(PAGES_DIR);
-		if ($handle === false)
-			throw new Exception('Could not read '.PAGES_DIR);
-		
-		foreach (new DirectoryIterator(PAGES_DIR) as $file)
-		{
-			if ($file->isDot())
-				continue;
-
-			$filepath	= PAGES_DIR.'/'.$file;
-
-			if ( @unlink($filepath) )
-					echo "deleting $file \n";
-				else
-					throw new Exception('Error deleting '.$filepath);
-		}
+		self::purge(0);
 	}
 
 	/**
 	 * removes all pages that have not been accessed in MAX_AGE in seconds
 	 */
-	public static function purge()
+	public static function purge($max_age = MAX_AGE)
 	{
 		//calculate the max. timestamp for said age
-		$min_stamp		= time()-MAX_AGE;
+		$min_stamp		= time()-$max_age;
 
 		foreach (new DirectoryIterator(PAGES_DIR) as $file)
 		{
