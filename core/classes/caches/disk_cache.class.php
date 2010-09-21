@@ -198,10 +198,8 @@ class disk_cache implements cache
 				
 			if (filemtime($filepath) <= $min_stamp)
 				//too old
-				if (strpos($filename,'.tmp') === 40)
-					//...file is cache object, 40 chars then .tmp extension, (fast check)
-					if (! @unlink($filepath) )
-						throw new Exception('Error deleting '.$filepath);
+				if (! @unlink($filepath) )
+					throw new Exception('Error deleting '.$filepath);
 		}		
 	}
 	
