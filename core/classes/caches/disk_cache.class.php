@@ -189,22 +189,20 @@ class disk_cache implements cache
 		//calculate the max. timestamp for said age
 		$min_stamp		= time()-$max_age;
 			
-		$handle		= @opendir($this->cache_dir);
-		if ($handle === false)
-			throw new Exception('Could not read cache dir for gc');
-
-		while (($filename	= readdir($handle)) !== false)
+		foreach (new DirectoryIterator($this->cache_dir) as $file)
 		{
-			$filepath		= $this->cache_dir.$filename;
+			if ($file->isDot())
+				continue;
+
+			$filepath		= $this->cache_dir.'/'.$file;
 				
 			if (filemtime($filepath) <= $min_stamp)
 				//too old
 				if (strpos($filename,'.tmp') === 40)
 					//...file is cache object, 40 chars then .tmp extension, (fast check)
 					if (! @unlink($filepath) )
-						throw new Exception('Error deleting cache object(s)');
-		}
-		closedir($handle);		
+						throw new Exception('Error deleting '.$filepath);
+		}		
 	}
 	
 	/**
