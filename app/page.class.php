@@ -52,6 +52,12 @@ class page
 		// the Exception thrown in the path function won't get caught.....
 		$valid_path	= self::path($id);
 
+		// tell the browser to cache it for 2 days, as it is a one-time created
+		// page it will practically never expire
+		// even though the HTTP class does a 304 if it's not modified 
+		// anyway
+		header('Expires: '.date('r', (time()+172800)) );
+
 		$s 	= new http();
 		$s->load_local_file($valid_path);
 	}
