@@ -30,6 +30,9 @@ define('PAGES_DIR',STORE_DIR);
 // maximum time to keep an unused page (default is 2 months)
 define('MAX_AGE',2419200);
 
+// max size in KB for source posts
+define('MAX_SOURCE_SIZE',30);
+
 // page id length (increase for better collision immunity)
 // with ~10000 articles, at 6 there is a ~1/1677 chance of a collision.
 // each increment reduces the chance by ~16x. The maximum is 40.

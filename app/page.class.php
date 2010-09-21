@@ -63,6 +63,10 @@ class page
 	 */
 	public static function create(&$source)
 	{
+		// check source is not too big
+		if (strlen($source) > (MAX_SOURCE_SIZE*1000))
+			throw new Exception ('Source is too big. Max size is '.MAX_SOURCE_SIZE.'K');
+
 		$id		= self::id($source);
 
 		$file	= self::path($id);
