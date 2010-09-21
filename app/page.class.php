@@ -76,8 +76,22 @@ class page
 	 */
 	public static function flush()
 	{
-		foreach (glob(PAGES_DIR.'*.*') as $file )
-			unlink ($file);
+		$handle		= @opendir(PAGES_DIR);
+		if ($handle === false)
+			throw new Exception('Could not read '.PAGES_DIR);
+		
+		foreach (new DirectoryIterator(PAGES_DIR) as $file)
+		{
+			if ($file->isDot())
+				continue;
+
+			$filepath	= PAGES_DIR.'/'.$file;
+
+			if ( @unlink($filepath) )
+					echo "deleting $file \n";
+				else
+					throw new Exception('Error deleting '.$filepath);
+		}
 	}
 
 	/**
@@ -85,6 +99,23 @@ class page
 	 */
 	public static function purge()
 	{
+		//calculate the max. timestamp for said age
+		$min_stamp		= time()-MAX_AGE;
+
+		foreach (new DirectoryIterator(PAGES_DIR) as $file)
+		{
+			if ($file->isDot())
+				continue;
+
+			$filepath	= PAGES_DIR.'/'.$file;
+
+			if (fileatime($filepath) <= $min_stamp)
+				//too old
+				if ( @unlink($filepath) )
+					echo "deleting $file \n";
+				else
+					throw new Exception('Error deleting '.$filepath);
+		}
 	}
 
 	/**
