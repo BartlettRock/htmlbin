@@ -53,8 +53,17 @@ class input
 			return self::cli();
 		}
 		//assume web mode...
-		else
+		elseif(!get_magic_quotes_gpc())
+			// inputs are NOT dirty (escaped ' etc)
 			return $_REQUEST;
+		else
+		{
+			//inputs are dirty, slashes need to be removed
+			foreach ($_REQUEST as &$var)
+				$var	= stripslashes($var);
+
+			return $_REQUEST;
+		}
 	}
 	
 	/**
@@ -201,6 +210,8 @@ class input
 	public function header($name)
 	{
 		// for some reason, this is only supported as an apache module...
+		// if this changes in the future, then it can be implemented here
+		// transparently
 		
 		// convert the header name into php's silly superglobal $_SERVER 
 		// array format
