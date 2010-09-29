@@ -31,12 +31,12 @@ define('PAGES_DIR',STORE_DIR);
 define('MAX_AGE',2419200);
 
 // max size in KB for source posts
-define('MAX_SOURCE_SIZE',60);
+define('MAX_SOURCE_SIZE',30);
 
 // page id length (increase for better collision immunity)
-// with ~10000 articles, at 6 there is a ~1/1677 chance of a collision.
-// each increment reduces the chance by ~16x. The maximum is 40.
-define('HASH_LENGTH',6);
+// with ~10000 articles, at 5 there is a ~1/6000 chance of a collision.
+// each increment reduces the chance by ~36x. The maximum is 31.
+define('HASH_LENGTH',5);
 
 // verbose debug mode - will show exceptions if true
 // useful to quieten for production use

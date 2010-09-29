@@ -30,6 +30,7 @@
  */
 class page
 {
+
 	/**
 	 * returns page ID given source
 	 * @param string $source HTML source code
@@ -37,9 +38,12 @@ class page
 	 */
 	public static function id(&$source)
 	{
-		// return the last 5 characters of a random salted sha1 hash
-		// this conforms to ID regex		
-		return substr( sha1(__FILE__.$source) , -HASH_LENGTH);
+		$hash	= sha1(__FILE__.$source);
+
+		$hash	= base_convert($hash, 16, 36);
+
+		// return the last x characters, conforming to /^[a-z0-9]{'.HASH_LENGTH.'}$/
+		return substr($hash, -HASH_LENGTH);
 	}
 
 	/**
@@ -120,12 +124,12 @@ class page
 	 */
 	public static function path(&$id)
 	{
-		// valid ID is  HASH_LENGTH  hex chars
-		$regex	= '/^[a-f0-9]{'.HASH_LENGTH.'}$/';
+		// allow case insensitivity
+		$id		= strtolower($id);
 
 		// check the ID is valid first
-		if (!preg_match ($regex,$id))
-			throw new Exception('invalid ID given');
+		if (!preg_match ('/^[a-z0-9]{'.HASH_LENGTH.'}$/',$id))
+			throw new Exception('invalid ID given ');
 
 		return PAGES_DIR.'/'.$id.'.html';
 	}
