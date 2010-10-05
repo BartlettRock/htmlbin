@@ -38,6 +38,12 @@ define('MAX_SOURCE_SIZE',30);
 // each increment reduces the chance by ~36x. The maximum is 31.
 define('HASH_LENGTH',5);
 
+// internal static leaf files are unchanging under normal use. This enables
+// client side caching, and will reduce the number of GET requests the app uses.
+// If they do change (for example, if the app is upgraded) then this could cause
+// problems; hence it is disabled by default.
+define ('PERSISTENT_STATIC_LEAVES',false);
+
 // verbose debug mode - will show exceptions if true
 // useful to quieten for production use
 define('VERBOSE',true);

@@ -188,7 +188,7 @@ class manifest
 				throw new Exception('Magic file with id: "'.strip_tags($id).'" does not exist');
 		}
 		elseif (!is_readable($path))
-			throw new Exception('File is not accessible. Check permissions.');
+			throw new Exception($path.' is not accessible. Check permissions.');
 		else
 			return $path;
 	}

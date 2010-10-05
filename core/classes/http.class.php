@@ -26,7 +26,8 @@
  * http server class
  * 
  * Allows voswork to serve files other than normal script output.
- * For example, It can be used to download images, CSS or javascript.
+ * For example, It can be used to download images, CSS or javascript - or more 
+ * importantly, dynamically served files, possibly with authentication
  * It makes use of caching and acts as a normal webserver.
  *
  * Internal attributes must be set up. The destructor will commit and serve.
@@ -48,6 +49,10 @@ class http
 	
 	// inline or attachment (browser view or force download)
 	public $inline		= false;
+
+	// should the client keep the file indefinitey?
+	// if the file never changes, tell the client by setting this!
+	public $persistent	= false;
 
 	/**
 	 * constructor
@@ -211,7 +216,7 @@ class http
 			case 'ppt':	return 'application/vnd.ms-powerpoint';	break;
 			case 'gif':	return 'image/gif';						break;
 			case 'png':	return 'image/png';						break;
-			case 'jpg':	return 'image/jpg';						break;
+			case 'jpg':	return 'image/jpeg';						break;
 			//if the ext is not recognised, force the browser to download it as a binary file
 			default:	return 'application/octet-stream';
 		}		 
@@ -225,6 +230,7 @@ class http
 	 */
 	public static function status($code)
 	{
+		header('Content-Type: text/plain');
 		switch($code)
 		{
 			case 200:
@@ -239,15 +245,17 @@ class http
 			case 403:
 				$code	= '403 Forbidden';
 			break;
-			case 500:
-				$code	= '500 Internal Server Error';
-			break;
 			case 301:
 				$code	= '301 Moved Permanently';
 			break;
+
+			// unknown default to 500 to at least give something relevant
+			default:
+			case 500:
+				$code	= '500 Internal Server Error';
+			break;
 		}
 		header('HTTP/1.1 '.$code);
-		header('Content-Type: text/plain');	
 		echo($code."\n");
 	}
 	 
@@ -324,10 +332,10 @@ class http
 		if (isset($this->size))
 			// this breaks compatability with gz handling
 			header('Content-Length: '.$this->size);
-		
-		// keep IE happy........
-		header('Pragma: public');
-		
+
+		// if the file never changes, tell the client!!
+		$this->dictate_cache();
+
 		// Etag
 		if (isset($this->etag))
 			header('Etag: '.$this->etag);
@@ -336,32 +344,6 @@ class http
 		$this->read();
 	 	
 	 }
-	 
-	/**
-	 * decide what to do based on the status code
-	 */
-	public function __destruct()
-	{
-		// does not work with cgi
-		//if (headers_sent() )
-			//throw new Exception('headers already sent, incorrect usage');
-		
-		switch($this->status)
-		{
-			case 200:
-				//actually serve the file based on attributes, everything has passed
-				$this->commit();
-			break;
-
-			case null:
-				throw new Exception('(HTTP) $this->status must be set');
-			break;
-
-			default:
-				self::status($this->status);
-		}
-			
-	}
 
 	/**
 	 * redirects a relative or absolute url
@@ -379,6 +361,66 @@ class http
 		// must provide a full absolute URL
 		header('Location: '.$url);
 		self::status(301);
+	}
+
+	/**
+	 * tells the client to cache or not (none or ~infinite) based on 
+	 * $this->persistent flag
+	 */
+	protected function dictate_cache()
+	{
+		if ($this->persistent)
+		{
+			// cache it client side for about 3 years, effectively ~infinite!
+			header('Cache-Control: public, maxage=99999999');
+
+			// depreciated old way for HTTP/1.0 (absolute, therefore flawed)	
+			header('Expires: '.date('D, d M Y H:i:s', (time()+99999999)).' GMT');
+		}
+		else
+		{
+			// make it explicitly non-cachable
+			header('Cache-Control: no-cache,must-revalidate');
+
+			// depreciated old way for HTTP/1.0 (absolute, therefore flawed)
+			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+		}
+	}
+
+	/**
+	 * decide what to do based on the status code
+	 */
+	public function __destruct()
+	{
+		// does not work with cgi
+		//if (headers_sent() )
+			//throw new Exception('headers already sent, incorrect usage');
+		
+		switch($this->status)
+		{
+			case 200:
+				// actually serve the file based on attributes
+				// (the idea is to try to avoid this where possible for speed!)
+				$this->commit();
+			break;
+
+			case 304:
+				// if the persistent option is enabled after the first transfer
+				// the client will only receive 304s and therefore will need to 
+				// told as well! (not just on 200)
+				$this->dictate_cache();
+				$this->status(304);
+			break;
+
+			case null:
+				throw new Exception('(HTTP) $this->status must be set');
+			break;
+
+			// catch all
+			default:
+				self::status($this->status);
+		}
+			
 	}
 }
 ?>

@@ -64,6 +64,9 @@ class page
 
 		$s 	= new http();
 		$s->load_local_file($valid_path);
+
+		// pages never change, tell the client
+		$s->persistent	= true;
 	}
 
 	/**

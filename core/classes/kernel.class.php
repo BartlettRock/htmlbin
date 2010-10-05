@@ -102,6 +102,11 @@ class kernel
 			$s			= new http();
 			//also overide filename
 			$s->load_local_file($path);
+	
+			if (PERSISTENT_STATIC_LEAVES)
+				// the client can keep the same file for one month.
+				$s->persistent	= true;
+
 			//override name
 			$s->name	= $leaf.'.'.$ext;
 		}
@@ -223,6 +228,9 @@ class kernel
 	 */
 	public static function handle_exception($e)
 	{
+			// try cancel any previous output
+			while (@ob_end_clean() );
+			
 			//make the browser use a monospace font
 			@header('Content-type:text/plain');
 
