@@ -3,12 +3,53 @@
 <head>
 <title>htmlbin - Paste to host!</title>
 <link rel="stylesheet" type="text/css" media="screen" href="?leaf=style" />
+<script type="text/javascript" src="?leaf=jquery"></script>
+<script type="text/javascript">
+$(document).ready(function()
+{
+	// hook on submit button click
+	$('#submit').click(function ()
+	{
+		// get source
+		var source	= $('textarea[name=source]');
+
+		// organise data for POST submission
+		var data	= 'source='+encodeURIComponent(source.val());
+
+		// show loading
+		$('#stage').html('<p>Creating page...</p>');
+
+		$.ajax(
+		{
+			url: "?leaf=create",
+			type: "GET",
+			dataType: 'json',
+			data: data,
+			cache: false,
+			success: function(data)
+			{
+				if (data.url)
+				{
+					$('#stage').html('Your page has been created: <a href="'+data.url+'" target="_blank">'+data.url+'</a>');				
+				}
+				else if(data.error)
+				{
+					$('#stage').html('Error: '+data.error);
+				}
+			}
+		});
+
+		// overide default behavior
+		return false;
+	});	
+});
+</script>
 </head>
 <body>
 
 <h1>Paste to host your html!</h1>
 
-<form action="?leaf=create" method="post">
+<form>
 <textarea name="source">
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -29,9 +70,11 @@ With some text and css
 &lt;/html&gt;
 </textarea>
 <br />
-<input type="submit" value="Host!" />
+<input type="submit" id="submit" value="Host!" />
 </form>
-<p><a href="?leaf=faq">FAQ</a></p>
+<p><div id="stage">
+<a href="?leaf=faq">FAQ</a>
+<p/></div>
 <p><em><a href="http://htmlbin.googlecode.com/">htmlbin</a> powered by <a href="http://voswork.googlecode.com/">voswork</a></em></p>
 </body>
 </html>

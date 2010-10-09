@@ -1,6 +1,6 @@
 <?php
 /**
- * creates a new htmlbin page
+ * creates a new htmlbin page, returning relevant information as JSON
  *
  *     htmlbin Copyright (C) 2010  Callan Bryant <callan1990@googlemail.com>
  *
@@ -25,26 +25,21 @@
  * @author Callan Bryant <callan1990@googlemail.com>
  */
 
-if (!input::arg('source') )
-	throw new Exception('no source given');
+try
+{
+	if (!input::arg('source') )
+		throw new Exception('no source given');
 
-$id		= page::create(input::arg('source'));
+	$id		= page::create(input::arg('source'));
 
-$link	= 'http://'.$_SERVER['SERVER_NAME'].'/?'.$id;
+	$url	= 'http://'.$_SERVER['SERVER_NAME'].'/?'.$id;
 
+	$data['url']	= $url;
+}
+catch (Exception $e)
+{
+	$data['error']	= $e->getMessage();
+}
+
+echo json_encode($data);
 ?>
-<!DOCTYPE html>
-<html>
-
-<head>
-<title>htmlbin - page created!</title>
-<link rel="stylesheet" type="text/css" media="screen" href="?leaf=style" />
-</head>
-
-<body>
-
-<h1>Your page has been created!</h1>
-
-Here is the link: <a href="<?php echo $link; ?>"><?php echo $link; ?></a>
-</body>
-</html>
