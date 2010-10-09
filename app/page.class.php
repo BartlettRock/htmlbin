@@ -43,7 +43,7 @@ class page
 		$hash	= base_convert($hash, 16, 36);
 
 		// return the last x characters, conforming to /^[a-z0-9]{'.HASH_LENGTH.'}$/
-		return substr($hash, -HASH_LENGTH);
+		return substr($hash,0,HASH_LENGTH);
 	}
 
 	/**
